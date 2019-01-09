@@ -13,6 +13,10 @@ Getting started
 
 
 ### Data processing:
+First, you need to download the data at: https://chaos.grand-challenge.org/Download/.
+Unzip them and put the unzipped files "CT_data_batch1" and "MR_data_batch1" in a directory called "data/original".
+Then, place "data" inside "Segmentron".
+
 The livers data of the competition are saved as dicom images therefore we first need to collect them under a .nii.gz file
 which will then be used in the training.
 
@@ -34,6 +38,16 @@ After the above mentioned step, the extracted dataset, located in &output_data_d
 As for the CT's patient subdirectory, there will be two files "CT.nii.gz" and  "CT_truth.nii.gz", respectively corresponding to the data and the ground truth files.
 While, for the MR's patient subdirectory, there are 5 files: "MR_inPhase_T1DUAL.nii.gz", "MR_outPhase_T1DUAL.nii.gz" with the corresponding ground truth file in "MR_T1DUAL_truth.nii.gz" (same for inPhase and outPhase data) and "MR_T2SPIR.nii.gz" with the ground truth in "MR_T2SPIR_truth.nii.gz" 
 
+#### 2. TRAINING:
+Once the extracted data are ready, you can procede by executing the "Parsing.py" file, an example is shown below.
+Read the arguments in the main of "Parsing.py" to have a more clear understanding of the input parameters.
+
+```
+cd Segmentron
+
+python3 Parsing.py --data_file "liver" --Base_directory "Liver Region Segmentation" --num_GPU 2 --data_directory "./data/extracted_small"
+
+```
 
 
 How to Cite

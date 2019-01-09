@@ -186,8 +186,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--local',
         type=bool,
-        default=True,
-        help='True if running in local and no GPU availables.' #Used for debug
+        default=False,
+        help='True if running in local and no GPU availables.' #Used for debug, it will cush when trying to load the model.
     )
     parser.add_argument(
         '--EWC',
