@@ -5,6 +5,7 @@ import gpustat
 import time
 import os
 import argparse
+import numpy as np
 
 
 def get_free_gpus(num, except_gpu=None):
@@ -26,6 +27,7 @@ def get_free_gpus(num, except_gpu=None):
 
 
 def main():
+
     train_isensee2017.config.update(vars(FLAGS))
     model = train_isensee2017.main(overwrite=False)
     train_isensee2017.model
@@ -197,7 +199,10 @@ if __name__ == '__main__':
     if not FLAGS.data_file:
         print('Please specify the argument data_file')
 
-    FLAGS.GPU = FLAGS.num_GPU
+    FLAGS.GPU = []
+    for i in range(0,FLAGS.num_GPU):
+        FLAGS.GPU.append("True")
+
     FLAGS.Base_directory = os.path.join(os.getcwd(),'Data_and_Pretrained_Models',FLAGS.Base_directory)
     FLAGS.data_file = os.path.join(FLAGS.Base_directory,FLAGS.data_file)
     FLAGS.nb_channels = len(FLAGS.training_modalities)
