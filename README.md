@@ -1,13 +1,11 @@
 # Segmentron
-Life-long learning approach to Medical image segmentation of Liver and other abdominal organs.
-Based on the online competition: https://chaos.grand-challenge.org/
-============
+### Life-long learning approach to Medical image segmentation of Liver and other abdominal organs. Based on the online competition: https://chaos.grand-challenge.org/
 
 ## Getting started
 
 ### Prerequisites:
-Installation
-============
+#### Installation
+
 1- If not already done, install Tensorflow
 
 2- Downlad the directory this README is part of 
