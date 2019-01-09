@@ -7,10 +7,13 @@ Getting started
 ### Prerequisites:
 #### Installation
 
-1- If not already done, install Tensorflow
+1- Install the depencies listed in "requirements.txt"
+```
+cd Segmentron
 
-2- Downlad the directory this README is part of 
+pip3 install -r requirements.txt
 
+```
 
 ### Data processing:
 First, you need to download the data at: https://chaos.grand-challenge.org/Download/.
