@@ -6,6 +6,18 @@ from nilearn.image import new_img_like
 from .utils.utils import resize, read_image_files
 from .utils import crop_img, crop_img_to, read_image
 
+from matplotlib import pyplot
+import numpy as np
+
+
+def show_liver_slice(slice, ArrayDicom):
+    pyplot.figure(dpi=500)
+    pyplot.axes().set_aspect('equal', 'datalim')
+    pyplot.set_cmap(pyplot.gray())
+    x = np.arange(0, ArrayDicom.shape[0], 1)
+    y = np.arange(0, ArrayDicom.shape[1], 1)
+    #pyplot.pcolormesh(x, y, numpy.flipud(ArrayDicom[:, :, slice]))
+    pyplot.pcolormesh(x, y, ArrayDicom[:, :, slice])
 
 def find_downsized_info(training_data_files, input_shape):
     foreground = get_complete_foreground(training_data_files)
@@ -66,6 +78,7 @@ def get_foreground_from_set_of_files(set_of_files, background_value=0, tolerance
             foreground = np.zeros(is_foreground.shape, dtype=np.uint8)
 
         foreground[is_foreground] = 1
+
     if return_image:
         return new_img_like(image, foreground)
     else:

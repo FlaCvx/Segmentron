@@ -12,7 +12,7 @@ from keras.backend import tensorflow_backend
 
 config = dict()
 
-config["n_base_filters"] = 16
+config["n_base_filters"] = 16  #TODO: Chiedere a Luca da dove viene sto 16 !?!?!?!
 config["deconvolution"] = True  # if False, will use upsampling instead of deconvolution
 config["batch_size"] = 1
 config["validation_batch_size"] = 1
@@ -32,14 +32,14 @@ def fetch_training_data_files(return_subject_ids=False):
     training_data_files = list()
     subject_ids = list()
 
-    if os.path.isdir(config['data_directory']):
-        if os.path.isfile(glob.glob(os.path.join(config['data_directory'], "*","*"))[0]):
-            Directories = glob.glob(os.path.join(config['data_directory'], "*"))
-            truth = "truth"
+    if os.path.isdir(config["data_directory"]):
+        if os.path.isfile(glob.glob(os.path.join(config["data_directory"], "*","*"))[0]):
+            Directories = glob.glob(os.path.join(config["data_directory"], "*"))
+            truth = "_truth"
             ending = ".nii.gz"
-        elif os.path.isfile(glob.glob(os.path.join(config['data_directory'], "*","*","*"))[0]):
-            Directories = glob.glob(os.path.join(config['data'], "*","*"))
-            truth = "truth"
+        elif os.path.isfile(glob.glob(os.path.join(config["data_directory"], "*","*","*"))[0]):
+            Directories = glob.glob(os.path.join(config["data_directory"], "*","*"))
+            truth = "_truth.nii.gz"
             ending = ".nii.gz"
         else:
             print(
@@ -55,7 +55,7 @@ def fetch_training_data_files(return_subject_ids=False):
             raise EnvironmentError
     else:
         print(
-            config['data_directory'] + " does not exist"
+            config["data_directory"] + " does not exist"
             '\n Please provide a file structure that obeys the following rules: \n Data_directory \n --> Patient_directory'
                 ' \n      --> Patient_file'
                 ' \n OR'
@@ -69,9 +69,31 @@ def fetch_training_data_files(return_subject_ids=False):
     for subject_dir in Directories:
         subject_ids.append(os.path.basename(subject_dir))
         subject_files = list()
-        for modality in config["training_modalities"] + [truth]:
-            subject_files.append(os.path.join(subject_dir, modality + ending))
-        training_data_files.append(tuple(subject_files))
+        if ((subject_dir.split("/")[3]).split("_")[0] == 'CT'):
+            if ('CT' in config["training_technologies"]):
+                subject_files.append(os.path.join(subject_dir, 'CT' +ending))
+                subject_files.append(os.path.join(subject_dir, 'CT' +truth))
+                training_data_files.append(tuple(subject_files))
+        if ((subject_dir.split("/")[3]).split("_")[0]=='MR'):
+            if ('MR' in config["training_technologies"]):
+                for modality in config["training_modalities"][1]:
+                    if modality == 'T1DUAL':
+                        #Once for in_phase data
+                        subject_files = list()
+                        subject_files.append(os.path.join(subject_dir, 'MR_inPhase_' + modality + ending))
+                        subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
+                        training_data_files.append(tuple(subject_files))
+                        #Once for out_phase data
+                        subject_files = list()
+                        subject_files.append(os.path.join(subject_dir, 'MR_outPhase_' + modality + ending))
+                        subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
+                        training_data_files.append(tuple(subject_files))
+                    else:
+                        subject_files = list()
+                        subject_files.append(os.path.join(subject_dir, 'MR_' + modality + ending))
+                        subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
+                        training_data_files.append(tuple(subject_files))
+
     if return_subject_ids:
         return training_data_files, subject_ids
     else:
@@ -95,10 +117,31 @@ def main(overwrite=False):
 
     data_file_opened = open_data_file(config["data_file"])
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
+    # get training and testing generators
+    train_generator, validation_generator, n_train_steps, n_validation_steps = get_training_and_validation_generators(
+        data_file_opened,
+        batch_size=config["batch_size"],
+        data_split=config["validation_split"],
+        overwrite=overwrite,
+        validation_keys_file=config["validation_file"],
+        training_keys_file=config["training_file"],
+        n_labels=config["n_labels"],
+        labels=config["labels"],
+        patch_shape=config["patch_shape"],
+        validation_batch_size=config["validation_batch_size"],
+        validation_patch_overlap=config["validation_patch_overlap"],
+        training_patch_start_offset=config["training_patch_start_offset"],
+        permute=config["permute"],
+        augment=config["augment"],
+        skip_blank=config["skip_blank"],
+        augment_flip=config["flip"],
+        augment_distortion_factor=config["distort"])
 
-    sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
-
+    if config["local"]==False:
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
+        sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
+    else:
+        sess = tf.Session()
     tensorflow_backend.set_session(sess)
 
     if config["EWC"]:

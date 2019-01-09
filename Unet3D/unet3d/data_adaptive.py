@@ -22,7 +22,9 @@ def create_data_file(out_file, n_channels, n_samples, image_shape):
 def write_image_data_to_file(image_files, data_storage, truth_storage, padding, crop_slice,n_channels, affine_storage,
                              truth_dtype=np.uint8, normalize = 'No', image_shape = (160,208,160)):
 
-
+    # image_files is -->
+    # Example: [('sub1-T1.nii.gz', 'sub1-T2.nii.gz', 'sub1-truth.nii.gz'),
+    #           ('sub2-T1.nii.gz', 'sub2-T2.nii.gz', 'sub2-truth.nii.gz')]
     if all(p > 0 for p in traverse(padding)):
         # No negative values in padding means the images fit inside the defined shape
         image_shape = None
@@ -93,17 +95,24 @@ def get_crop_slice_and_image_shape(training_data_files):
 
 def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subject_ids=None,
                        normalize= 'No', image_shape = (208,208,208)):
+
+    #TODO: CHANGE THE DEFAULT image_shape
     """
     Takes in a set of training images and writes those images to an hdf5 file.
     :param training_data_files: List of tuples containing the training data files. The modalities should be listed in
     the same order in each tuple. The last item in each tuple must be the labeled image.
-    Example: [('sub1-T1.nii.gz', 'sub1-T2.nii.gz', 'sub1-truth.nii.gz'),
-              ('sub2-T1.nii.gz', 'sub2-T2.nii.gz', 'sub2-truth.nii.gz')]
+    Example: [('sub1-T1.nii.gz', 'sub1-truth.nii.gz'),
+              ( 'sub1-T2.nii.gz',  'sub1-truth.nii.gz'),
+              ('sub2-T1.nii.gz', 'sub2-truth.nii.gz'),
+              ('sub2-T2.nii.gz',  'sub2-truth.nii.gz')]
+              #Fla: I modify it because I have different ground truths for the different modalities.
+
     :param out_file: Where the hdf5 file will be written to.
     :param image_shape: Shape of the images that will be saved to the hdf5 file.
     :param truth_dtype: Default is 8-bit unsigned integer.
     :return: Location of the hdf5 file with the image data written to it.
     """
+
     n_samples = len(training_data_files)
     n_channels = len(training_data_files[0]) - 1
 
@@ -115,7 +124,8 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
         hdf5_file, data_storage, truth_storage, affine_storage = create_data_file(out_file,
                                                                                   n_channels=n_channels,
                                                                                   n_samples=n_samples,
-                                                                                  image_shape=image_shape)
+                                                                                  image_shape=min_dim)
+        #TODO: Chiedere a Luca se in "image_shape" devo lasciare image_shape o come ho fatto metter min_dim
 
     except Exception as e:
         # If something goes wrong, delete the incomplete data file
@@ -130,7 +140,11 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
                               truth_dtype=truth_dtype,
                               n_channels=n_channels,
                               affine_storage=affine_storage,
-                              normalize=normalize)
+                              normalize=normalize,
+                              image_shape=min_dim)
+    # TODO bis: Chiedere a Luca se in "image_shape" devo lasciare image_shape o come ho fatto metter min_dim
+
+    # TODO: Chiedre a Luca: Siccome ho diversi data associati allo stesso paziente ha senso che crei sto arrai  di subject_ids ?
     if subject_ids:
         hdf5_file.create_array(hdf5_file.root,
                                'subject_ids',
@@ -210,3 +224,8 @@ def traverse(item):
                 yield j
     except TypeError:
         yield item
+
+
+#if __name__ == "__main__":
+
+

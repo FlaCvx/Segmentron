@@ -26,7 +26,10 @@ def get_free_gpus(num, except_gpu=None):
 
 
 def main():
-    FLAGS.GPU = get_free_gpus(FLAGS.num_GPU)
+    if FLAGS.local==False:
+        FLAGS.GPU = get_free_gpus(FLAGS.num_GPU)
+    else:
+        FLAGS.GPU = []
     train_isensee2017.config.update(vars(FLAGS))
     model = train_isensee2017.main(overwrite=False)
     train_isensee2017.model
@@ -43,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--Base_directory',
         type=str,
-        default='Brain_Region_Segmentation',
+        default='Liver_Region_Segmentation',
         help='String; New Folder where The Model will be stored.'
     )
     parser.add_argument(
@@ -55,8 +58,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--image_shape',
         type=lambda s: tuple([int(item) for item in s.split(',')]),
-        default=(160, 208, 160),
-        help='Tuple; The dimensions of the input image, e.g. : 160,208,160'
+        default=(512, 512, 123), #Max dimension of liver images.
+        help='Tuple; The dimensions of the max input image, e.g. : 512, 512, 123'
     )
     parser.add_argument(
         '--normalize',
@@ -162,15 +165,29 @@ if __name__ == '__main__':
     )
     parser.add_argument(
         '--labels',
-        type= str,
-        default='1,2,3,4,5,6,7,8,9,10,11,12,13,14',
-        help='Which labels to detect'
+        type=str,
+        default=('80, 160, 240, 255'),
+        help='Which labels to detect. 80: Liver, 160: Right Kidney, 240: Left Kidney, 255:Spleen'
+    )
+
+    parser.add_argument(
+        '--training_technologies',
+        type=lambda s: tuple([str(item) for item in s.split(',')]),
+        default=('CT', 'MR'),
+        help='names of the training technologies files.'
     )
     parser.add_argument(
         '--training_modalities',
         type=lambda s: tuple([str(item) for item in s.split(',')]),
-        default=('t1', 't1ce', 'flair', 't2'),
-        help='names of the training modality files. Also sets number of input channels.'
+        default=(( ),('T1DUAL','T2SPIR')),
+        help='names of the training modality files.'
+    )
+
+    parser.add_argument(
+        '--local',
+        type=bool,
+        default=True,
+        help='True if running in local and no GPU availables.' #Used for debug
     )
     parser.add_argument(
         '--EWC',
