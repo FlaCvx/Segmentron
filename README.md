@@ -14,7 +14,7 @@ Getting started
 ```
 cd Segmentron
 
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 
 ```
 
@@ -34,7 +34,7 @@ The extraction of the dataset is done with the "extract_data.py" as follow:
 ```
 cd Segmentron
 
-python3 extract_data.py --original_data_dir "data/original" --output_data_dir "data/extracted"
+python extract_data.py --original_data_dir "data/original" --output_data_dir "data/extracted"
 
 ```
 
@@ -51,7 +51,7 @@ Read the arguments in the main of "Parsing.py" to have a more clear understandin
 ```
 cd Segmentron
 
-python3 Parsing.py --data_file "liver" --Base_directory "Liver Region Segmentation" --num_GPU 2 --data_directory "./data/extracted_small"
+python Parsing.py --data_file "liver" --Base_directory "Liver Region Segmentation" --num_GPU 2 --data_directory "./data/extracted_small"
 
 ```
 
