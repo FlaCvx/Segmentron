@@ -1,6 +1,8 @@
 #!/bin/bash
 
+module load gcc/6.3.0
 module load python_gpu/3.6.4
 module load hdf5
+
 bsub -n 20 -R "rusage[mem=8192,ngpus_excl_p=1]" python ~/cil18/run.py --action train_save --verbose ~/cil18/config_CNN_Keras_Model.json
 

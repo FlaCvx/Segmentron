@@ -7,7 +7,10 @@ Getting started
 ### Prerequisites:
 #### Installation
 
-1- Install the depencies listed in "requirements.txt"
+1- Create a virtual environment with python 3.6 and activate it.
+
+2- Install the depencies listed in "requirements.txt".
+
 ```
 cd Segmentron
 

@@ -13,3 +13,5 @@ def show_liver_slice(slice, ArrayDicom):
     y = np.arange(0, ArrayDicom.shape[1], 1)
     #pyplot.pcolormesh(x, y, numpy.flipud(ArrayDicom[:, :, slice]))
     pyplot.pcolormesh(x, y, ArrayDicom[:, :, slice])
+
+

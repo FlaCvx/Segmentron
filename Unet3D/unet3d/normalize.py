@@ -8,16 +8,13 @@ from .utils import crop_img, crop_img_to, read_image
 
 from matplotlib import pyplot
 import numpy as np
+import matplotlib.pyplot as plt
 
 
-def show_liver_slice(slice, ArrayDicom):
-    pyplot.figure(dpi=500)
-    pyplot.axes().set_aspect('equal', 'datalim')
-    pyplot.set_cmap(pyplot.gray())
-    x = np.arange(0, ArrayDicom.shape[0], 1)
-    y = np.arange(0, ArrayDicom.shape[1], 1)
-    #pyplot.pcolormesh(x, y, numpy.flipud(ArrayDicom[:, :, slice]))
-    pyplot.pcolormesh(x, y, ArrayDicom[:, :, slice])
+def show_liver_slice(index_slice, img_volume):
+    slice = img_volume[index_slice, : , :]
+    plt.figure()
+    plt.imshow(slice, cmap="gray", origin="lower")
 
 def find_downsized_info(training_data_files, input_shape):
     foreground = get_complete_foreground(training_data_files)

@@ -1,8 +1,3 @@
-"""
-Tools for converting, normalizing, and fixing the brats data.
-"""
-
-
 import glob
 import os
 import warnings
