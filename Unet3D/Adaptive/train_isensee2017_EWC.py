@@ -137,11 +137,9 @@ def main(overwrite=False):
         augment_flip=config["flip"],
         augment_distortion_factor=config["distort"])
 
-    if config["local"]==False:
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
-        sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
-    else:
-        sess = tf.Session()
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
+    sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
+
     tensorflow_backend.set_session(sess)
 
     if config["EWC"]:
