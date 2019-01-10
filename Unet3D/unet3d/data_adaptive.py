@@ -20,7 +20,7 @@ def create_data_file(out_file, n_channels, n_samples, image_shape):
     return hdf5_file, data_storage, truth_storage, affine_storage
 
 def write_image_data_to_file(image_files, data_storage, truth_storage, padding, crop_slice,n_channels, affine_storage,
-                             truth_dtype=np.uint8, normalize = 'No', image_shape = (512,512,512)):
+                             truth_dtype=np.uint8, normalize = 'No', image_shape = (160, 208, 160)):
 
     # image_files is -->
     # Example: [('sub1-T1.nii.gz', 'sub1-T2.nii.gz', 'sub1-truth.nii.gz'),
@@ -94,7 +94,7 @@ def get_crop_slice_and_image_shape(training_data_files):
     return crop_slice,image_shape
 
 def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subject_ids=None,
-                       normalize= 'No', image_shape = (512,512,512)):
+                       normalize= 'No', image_shape = (160, 208, 160)):
 
     #TODO: CHANGE THE DEFAULT image_shape
     """
