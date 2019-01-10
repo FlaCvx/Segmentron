@@ -117,26 +117,6 @@ def main(overwrite=False):
 
     data_file_opened = open_data_file(config["data_file"])
 
-    # get training and testing generators
-    train_generator, validation_generator, n_train_steps, n_validation_steps = get_training_and_validation_generators(
-        data_file_opened,
-        batch_size=config["batch_size"],
-        data_split=config["validation_split"],
-        overwrite=overwrite,
-        validation_keys_file=config["validation_file"],
-        training_keys_file=config["training_file"],
-        n_labels=config["n_labels"],
-        labels=config["labels"],
-        patch_shape=config["patch_shape"],
-        validation_batch_size=config["validation_batch_size"],
-        validation_patch_overlap=config["validation_patch_overlap"],
-        training_patch_start_offset=config["training_patch_start_offset"],
-        permute=config["permute"],
-        augment=config["augment"],
-        skip_blank=config["skip_blank"],
-        augment_flip=config["flip"],
-        augment_distortion_factor=config["distort"])
-
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
     sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
 

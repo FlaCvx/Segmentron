@@ -6,7 +6,7 @@ import time
 import os
 import argparse
 import numpy as np
-
+import pdb
 
 def get_free_gpus(num, except_gpu=None):
     gpu_list = gpustat.GPUStatCollection.new_query()
@@ -256,6 +256,7 @@ if __name__ == '__main__':
     FLAGS.n_labels = len(FLAGS.labels)
 
     if not FLAGS.return_name_only:
+        pdb.set_trace()
         main()
     else:
         print(FLAGS.model_file)

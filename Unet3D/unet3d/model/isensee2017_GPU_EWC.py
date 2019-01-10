@@ -7,6 +7,8 @@ from keras.optimizers import Adam
 from .unet import concatenate, EWC, create_convolution_block
 from ..metrics import weighted_dice_coefficient_loss
 import tensorflow as tf
+import pdb
+
 
 create_convolution_block = partial(create_convolution_block, activation=LeakyReLU, instance_normalization=True)
 

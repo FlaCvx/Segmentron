@@ -2,6 +2,7 @@ import os
 import copy
 from random import shuffle
 import itertools
+import pdb
 
 import numpy as np
 
@@ -136,6 +137,7 @@ def split_list(input_list, split=0.8, shuffle_list=True):
 def data_generator(data_file, index_list, batch_size=1, n_labels=1, labels=None, augment=False, augment_flip=True,
                    augment_distortion_factor=0.25, patch_shape=None, patch_overlap=0, patch_start_offset=None,
                    shuffle_index_list=True, skip_blank=True, permute=False):
+    pdb.set_trace()
     orig_index_list = index_list
     while True:
         x_list = list()
@@ -150,6 +152,7 @@ def data_generator(data_file, index_list, batch_size=1, n_labels=1, labels=None,
             shuffle(index_list)
         while len(index_list) > 0:
             index = index_list.pop()
+            pdb.set_trace()
             add_data(x_list, y_list, data_file, index, augment=augment, augment_flip=augment_flip,
                      augment_distortion_factor=augment_distortion_factor, patch_shape=patch_shape,
                      skip_blank=skip_blank, permute=permute)
@@ -207,6 +210,7 @@ def add_data(x_list, y_list, data_file, index, augment=False, augment_flip=False
     :param permute: will randomly permute the data (data must be 3D cube)
     :return:
     """
+    pdb.set_trace()
     data, truth = get_data_from_file(data_file, index, patch_shape=patch_shape)
     if augment:
         if patch_shape is not None:
@@ -229,12 +233,16 @@ def add_data(x_list, y_list, data_file, index, augment=False, augment_flip=False
 
 
 def get_data_from_file(data_file, index, patch_shape=None):
+    pdb.set_trace()
     if patch_shape:
         index, patch_index = index
+        pdb.set_trace()
         data, truth = get_data_from_file(data_file, index, patch_shape=None)
+        pdb.set_trace()
         x = get_patch_from_3d_data(data, patch_shape, patch_index)
         y = get_patch_from_3d_data(truth, patch_shape, patch_index)
     else:
+        pdb.set_trace()
         x, y = data_file.root.data[index], data_file.root.truth[index, 0]
     return x, y
 
