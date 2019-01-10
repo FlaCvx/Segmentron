@@ -56,7 +56,8 @@ if __name__ == '__main__':
     parser.add_argument(
         '--image_shape',
         type=lambda s: tuple([int(item) for item in s.split(',')]),
-        default=(512, 512, 123), #Max dimension of liver images.
+        default=(512, 512, 512), #Max dimension of liver images. #I put the last to 512 because it makesthe train_isensee work
+        #TODO: Check with luca that I can do it. Altrimenti la linea 111 di isensee2017_GPU_EWC non funziona...
         help='Tuple; The dimensions of the max input image, e.g. : 512, 512, 123'
     )
     parser.add_argument(
@@ -205,7 +206,8 @@ if __name__ == '__main__':
 
     FLAGS.Base_directory = os.path.join(os.getcwd(),'Data_and_Pretrained_Models',FLAGS.Base_directory)
     FLAGS.data_file = os.path.join(FLAGS.Base_directory,FLAGS.data_file)
-    FLAGS.nb_channels = len(FLAGS.training_modalities)
+    #TODO: Chidere Luca se va bene che qua ho messo 1 channel.
+    FLAGS.nb_channels = 1
     FLAGS.patch_shape = None
     FLAGS.truth_channel = FLAGS.nb_channels
     FLAGS.input_shape = tuple([FLAGS.nb_channels] + list(FLAGS.image_shape))

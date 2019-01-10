@@ -10,7 +10,7 @@ import tensorflow as tf
 
 create_convolution_block = partial(create_convolution_block, activation=LeakyReLU, instance_normalization=True)
 
-def isensee2017_model(input_shape=(4, 128, 128, 128), n_base_filters=16, depth=5,
+def isensee2017_model(input_shape=(1, 512, 512, 512), n_base_filters=16, depth=5,
                            dropout_rate=0.3, n_segmentation_levels=3, n_labels=4, optimizer=Adam,
                            initial_learning_rate=5e-4, loss_function=weighted_dice_coefficient_loss,
                            activation_name="sigmoid", non_trainable_list=None, ewc=False, gpu=2,
@@ -55,8 +55,8 @@ def isensee2017_model(input_shape=(4, 128, 128, 128), n_base_filters=16, depth=5
     level_output_layers = list()
     level_filters = list()
 
-    encoder_gpu = "/device:GPU:0"
-    decoder_gpu = "/device:GPU:0" if gpu == 1 else "/device:GPU:1"
+    encoder_gpu = "/device:CPU:0"
+    decoder_gpu = "/device:CPU:0" if gpu == 1 else "/device:CPU:1"
 
     index = 1
 

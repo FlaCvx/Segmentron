@@ -42,8 +42,7 @@ def get_callbacks(model_file, initial_learning_rate=0.0001, learning_rate_drop=0
                                      write_images=False,
                                      embeddings_freq=0,
                                      embeddings_layer_names=None,
-                                     embeddings_metadata=None,
-                                     embeddings_data=None))
+                                     embeddings_metadata=None))
     return callbacks
 
 

@@ -7,5 +7,5 @@ nilearn
 sklearn
 keras
 gpustat
-
+git+https://www.github.com/farizrahman4u/keras-contrib.git
 
