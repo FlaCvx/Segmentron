@@ -22,11 +22,11 @@ def get_free_gpus(num, except_gpu=None):
             free_gpu = []
             print('Not enough GPUs avaialble at this time. Waiting ....')
             time.sleep(20)
-
     return free_gpu
 
 
 def main():
+
 
     train_isensee2017.config.update(vars(FLAGS))
     model = train_isensee2017.main(overwrite=False)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--image_shape',
         type=lambda s: tuple([int(item) for item in s.split(',')]),
-        default=(160, 208, 160), #Max dimension of liver images. #I put the last to 512 because it makesthe train_isensee work
+        default=(512, 512, 512), #Max dimension of liver images. #I put the last to 512 because it makesthe train_isensee work
         #TODO: Check with luca that I can do it. Altrimenti la linea 111 di isensee2017_GPU_EWC non funziona...
         help='Tuple; The dimensions of the max input image, e.g. : 512, 512, 123'
     )
@@ -202,7 +202,7 @@ if __name__ == '__main__':
 
     FLAGS.GPU = []
     for i in range(0,FLAGS.num_GPU):
-        FLAGS.GPU.append("True")
+        FLAGS.GPU.append(i)
 
     FLAGS.Base_directory = os.path.join(os.getcwd(),'Data_and_Pretrained_Models',FLAGS.Base_directory)
     FLAGS.data_file = os.path.join(FLAGS.Base_directory,FLAGS.data_file)

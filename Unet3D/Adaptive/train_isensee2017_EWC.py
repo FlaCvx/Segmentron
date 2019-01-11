@@ -118,6 +118,7 @@ def main(overwrite=False):
     data_file_opened = open_data_file(config["data_file"])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
+
     sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
 
     tensorflow_backend.set_session(sess)
