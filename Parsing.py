@@ -30,8 +30,7 @@ def main():
 
     train_isensee2017.config.update(vars(FLAGS))
     model = train_isensee2017.main(overwrite=False)
-    train_isensee2017.model
-
+    model
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

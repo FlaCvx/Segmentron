@@ -5,6 +5,13 @@ import tables
 
 from .normalize import normalize_data_storage, reslice_image_set, get_cropping_parameters, reslice_image_set_mrbrains
 
+import matplotlib.pyplot as plt
+
+
+def show_liver_slice(index_slice, img_volume):
+    slice = img_volume[index_slice, : , :]
+    plt.figure()
+    plt.imshow(slice, cmap="gray", origin="lower")
 
 def create_data_file(out_file, n_channels, n_samples, image_shape):
     hdf5_file = tables.open_file(out_file, mode='w')
@@ -94,7 +101,7 @@ def get_crop_slice_and_image_shape(training_data_files):
     return crop_slice,image_shape
 
 def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subject_ids=None,
-                       normalize= 'No', image_shape = (160, 208, 160)):
+                       normalize= 'No', image_shape = (512, 512, 512)):
 
     #TODO: CHANGE THE DEFAULT image_shape
     """
@@ -114,7 +121,7 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
     """
 
     n_samples = len(training_data_files)
-    n_channels = 2
+    n_channels = len(training_data_files[0])-1
 
     crop_slice, min_dim = get_crop_slice_and_image_shape(training_data_files)
 

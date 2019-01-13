@@ -6,7 +6,6 @@ from nilearn.image import new_img_like
 from .utils.utils import resize, read_image_files
 from .utils import crop_img, crop_img_to, read_image
 
-from matplotlib import pyplot
 import numpy as np
 import matplotlib.pyplot as plt
 

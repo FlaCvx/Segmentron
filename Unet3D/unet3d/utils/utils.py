@@ -9,6 +9,13 @@ from nilearn.image import reorder_img, new_img_like
 from .nilearn_custom_utils.nilearn_utils import crop_img_to
 from .sitk_utils import resample_to_spacing, calculate_origin_offset
 
+import matplotlib.pyplot as plt
+
+
+def show_liver_slice(index_slice, img_volume):
+    slice = img_volume[index_slice, : , :]
+    plt.figure()
+    plt.imshow(slice, cmap="gray", origin="lower")
 
 def pickle_dump(item, out_file):
     with open(out_file, "wb") as opened_file:
@@ -63,7 +70,7 @@ def read_image(in_file, image_shape=None, interpolation='linear', crop=None):
 
 
 def fix_shape(image):
-    if image.shape[-1] == 1:
+    if image.shape[-1] == 1: #check the last index of the "shape" array
         return image.__class__(dataobj=np.squeeze(image.get_data()), affine=image.affine)
     return image
 
