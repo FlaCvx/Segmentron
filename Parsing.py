@@ -247,9 +247,9 @@ if __name__ == '__main__':
         FLAGS.logging_file = os.path.join(new_exp_name, 'Log.csv')
 
     if FLAGS.training_file == 'None':
-        FLAGS.training_file = os.path.join(FLAGS.Base_directory, 'training_ids.pkl')
+        FLAGS.training_file = os.path.join(FLAGS.Base_directory, FLAGS.data_file+'_training_ids.pkl')
     if FLAGS.validation_file == 'None':
-        FLAGS.validation_file = os.path.join(FLAGS.Base_directory, 'validation_ids.pkl')
+        FLAGS.validation_file = os.path.join(FLAGS.Base_directory, FLAGS.data_file+'_validation_ids.pkl')
 
     FLAGS.labels = f2(FLAGS.labels)
     FLAGS.n_labels = len(FLAGS.labels)
