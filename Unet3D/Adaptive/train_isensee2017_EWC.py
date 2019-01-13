@@ -12,7 +12,7 @@ from keras.backend import tensorflow_backend
 
 config = dict()
 
-config["n_base_filters"] = 16  #TODO: Chiedere a Luca da dove viene sto 16 !?!?!?!
+config["n_base_filters"] = 16
 config["deconvolution"] = True  # if False, will use upsampling instead of deconvolution
 config["batch_size"] = 1
 config["validation_batch_size"] = 1
@@ -114,7 +114,7 @@ def main(overwrite=False):
                            image_shape=config["image_shape"],
                            subject_ids=subject_ids,
                            normalize=config['normalize'])
-
+        print("Writing data to file "+config["data_file"]+"finished")
     data_file_opened = open_data_file(config["data_file"])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
@@ -151,6 +151,7 @@ def main(overwrite=False):
                                   n_base_filters=config["n_base_filters"],
                                   non_trainable_list=config['non_trainable_list'],
                                   gpu=len(config["GPU"]))
+        print("Model defined")
 
     if config["transfer_model_file"]:
 
@@ -192,6 +193,7 @@ def main(overwrite=False):
         skip_blank=config["skip_blank"],
         augment_flip=config["flip"],
         augment_distortion_factor=config["distort"])
+    print("Generators defined")
 
     # run training
     train_model(model=model,
@@ -208,5 +210,5 @@ def main(overwrite=False):
                 logging_file=config["logging_file"],
                 tensorboard_logdir=os.path.join(os.path.dirname(config["model_file"]), 'logdir'))
     data_file_opened.close()
-
+    print("Training done.")
     return model

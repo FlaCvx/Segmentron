@@ -114,7 +114,7 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
     """
 
     n_samples = len(training_data_files)
-    n_channels = len(training_data_files[0]) - 1
+    n_channels = 2
 
     crop_slice, min_dim = get_crop_slice_and_image_shape(training_data_files)
 
@@ -125,7 +125,8 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
                                                                                   n_channels=n_channels,
                                                                                   n_samples=n_samples,
                                                                                   image_shape=image_shape)
-        #TODO: Chiedere a Luca se in "image_shape" devo lasciare image_shape o come ho fatto metter min_dim
+        #TODO: CHiedere per i channels. Perchè ellis dice che la ground truth è compresa come channel
+        #TODO: Chiedere a Luca se in "image_shape" devo lasciare image_shape o metter min_dim
 
     except Exception as e:
         # If something goes wrong, delete the incomplete data file

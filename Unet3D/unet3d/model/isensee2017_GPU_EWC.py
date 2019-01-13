@@ -57,8 +57,8 @@ def isensee2017_model(input_shape=(1, 512, 512, 512), n_base_filters=16, depth=5
     level_output_layers = list()
     level_filters = list()
 
-    encoder_gpu = "/device:GPU:0"
-    decoder_gpu = "/device:GPU:0" if gpu == 1 else "/device:GPU:1"
+    encoder_gpu = "/device:CPU:0"
+    decoder_gpu = "/device:CPU:0" if gpu == 1 else "/device:CPU:1"
 
     index = 1
 

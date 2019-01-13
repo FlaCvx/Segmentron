@@ -206,7 +206,7 @@ if __name__ == '__main__':
 
     FLAGS.Base_directory = os.path.join(os.getcwd(),'Data_and_Pretrained_Models',FLAGS.Base_directory)
     FLAGS.data_file = os.path.join(FLAGS.Base_directory,FLAGS.data_file)
-    #TODO: Chidere Luca se va bene che qua ho messo 1 channel. O dovrei forse fare che quando traino t1 faccio 2 channel ??
+    #TODO: Chidere Luca se va bene che qua ho messo 1 channel o dovrei forse fare che quando traino t1 faccio 2 channel ??
     FLAGS.nb_channels = 1
 
     FLAGS.patch_shape = None
@@ -256,6 +256,7 @@ if __name__ == '__main__':
     FLAGS.n_labels = len(FLAGS.labels)
 
     if not FLAGS.return_name_only:
+        print("Parsing finished")
         main()
     else:
         print(FLAGS.model_file)
