@@ -255,7 +255,6 @@ if __name__ == '__main__':
     FLAGS.n_labels = len(FLAGS.labels)
 
     if not FLAGS.return_name_only:
-        print("Parsing finished")
         main()
     else:
         print(FLAGS.model_file)

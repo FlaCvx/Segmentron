@@ -55,7 +55,18 @@ python Parsing.py --data_file "liver" --Base_directory "Liver Region Segmentatio
 
 ```
 
+#### 3. PREDICTING:
+Once the model has been created, a prediction can be stored. The parameters given as input are shown below.
+The validation_file is a pikle file containing of the data used for the validation. The model file redirects to the model.h5 file. Training technologies and labels specify which technoloies were used to train the model and which labels the model was trained to predict.
+Finally, data_file specify the name of the h5 storage file that was used for training. 
 
+
+```
+cd Segmentron
+
+python predict.py --validation_file "liver_CT_validation_ids.pkl" --model_file "No_Transferexp_2/Model.h5" --training_technologies CT --labels 80 --data_file "liver_CT_mean_and_std.h5"
+
+```
 How to Cite
 ===========
 If you use this code or the pretrained models in your research,
