@@ -194,6 +194,13 @@ if __name__ == '__main__':
         help='Whether to use EWC to regularize parameters.'
     )
 
+    parser.add_argument(
+        '--epochs',
+        type=int,
+        default=1,
+        help='Number of epochs to use for training.'
+    )
+
     FLAGS, unparsed = parser.parse_known_args()
 
     if not FLAGS.data_file:

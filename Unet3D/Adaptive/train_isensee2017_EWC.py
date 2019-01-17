@@ -16,7 +16,6 @@ config["n_base_filters"] = 16
 config["deconvolution"] = True  # if False, will use upsampling instead of deconvolution
 config["batch_size"] = 1
 config["validation_batch_size"] = 1
-config["n_epochs"] = 1  # cutoff the training after this many epochs
 config["patience"] = 10  # learning rate will be reduced after this many epochs if the validation loss is not improving
 config["early_stop"] = 50  # training will be stopped after this many epochs without the validation loss improving
 config["initial_learning_rate"] = 5e-4
@@ -103,6 +102,7 @@ def fetch_training_data_files(return_subject_ids=False):
 
 def main(overwrite=False):
     config["data_file"] = config["data_file"] + '_' + config["normalize"] + '.h5'
+    config["n_epochs"] = config["epochs"]  # cutoff the training after this many epochs
 
     if overwrite or not os.path.exists(config["data_file"]):
         print('specified data_file does not exist yet at' + config["data_file"] + '. Trying to build a data_file from '

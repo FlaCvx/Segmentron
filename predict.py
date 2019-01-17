@@ -51,7 +51,7 @@ def main():
     fixed_path="./Data_and_Pretrained_Models/Liver Region Segmentation/"
     more_fixed_path="./Data_and_Pretrained_Models/Liver Region Segmentation/Trained_models/"+"Labels_"+str(FLAGS.labels)+"/"
 
-
+    prediction_dir = os.path.join(prediction_dir, FLAGS.model_file.split("/")[0])
     FLAGS.validation_file=os.path.abspath(fixed_path+str(FLAGS.validation_file))
     FLAGS.model_file=os.path.abspath(more_fixed_path+FLAGS.model_file)
     FLAGS.data_file=os.path.abspath(fixed_path+FLAGS.data_file)

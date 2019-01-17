@@ -10,12 +10,15 @@ def show_liver_slice(index_slice, img_volume):
     plt.imshow(slice, cmap="gray", origin="lower")
 
 def show_differences(data_file, truth_file, prediction_file):
+    count=0
     data = nib.load(os.path.abspath(data_file))
     truth = nib.load(os.path.abspath(truth_file))
     prediction = nib.load(os.path.abspath(prediction_file))
 
     fig, axeslist = plt.subplots(ncols=3, nrows=1)
     for slice1, slice2, slice3 in zip(data._data, truth._data, prediction._data):
+        count += 1
+        fig.suptitle('Slice: '+str(count), fontsize=20)
         axeslist.ravel()[0].imshow(slice1, cmap=plt.gray())
         axeslist.ravel()[0].set_title("Given data")
         axeslist.ravel()[0].set_axis_off()
