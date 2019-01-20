@@ -7,6 +7,7 @@ from Unet3D.unet3d.generator import get_training_and_validation_generators
 from Unet3D.unet3d.model.isensee2017_GPU_EWC import isensee2017_model
 from Unet3D.unet3d.training import load_old_model, train_model
 
+import numpy as np
 import tensorflow as tf
 from keras.backend import tensorflow_backend
 
@@ -65,8 +66,12 @@ def fetch_training_data_files(return_subject_ids=False):
                 ' \nPatient File must be modality name provided in config + .nii.gz and truth.nii.gz for ground truth images.'
         )
         raise EnvironmentError
+
+    count=1
     for subject_dir in Directories:
+        #subject_dir.replace(("/" + str(subject_dir.split("/")[4])), ("/" + str(count)))
         subject_ids.append(os.path.basename(subject_dir))
+        #count += 1
         subject_files = list()
         if ((subject_dir.split("/")[3]).split("_")[0] == 'CT'):
             if ('CT' in config["training_technologies"]):
@@ -109,6 +114,9 @@ def main(overwrite=False):
               'patient data at '+config['data_directory'])
         training_files, subject_ids = fetch_training_data_files(return_subject_ids=True)
 
+        subject_ids = list()
+        for i in range(1,len(training_files)+1):
+            subject_ids.append(str(i))
         write_data_to_file(training_files,
                            config["data_file"],
                            image_shape=config["image_shape"],

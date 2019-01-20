@@ -114,6 +114,8 @@ def extract_ground_truth_image(image_path, out_file):
 
     new_arr=np.fliplr(ArrayPng)
     array_img = nib.Nifti1Image(new_arr, np.diag([1, 2, 3, 1]))
+    if('CT' in out_file):
+        new_arr[np.where(new_arr == 1)] = 80
     nib.save(array_img, out_file) #The file will be array_img.dataobj
 
 
@@ -214,6 +216,14 @@ def convert_livers_data(livers_folder, out_folder, bias_field_correction=False, 
     :param overwrite: set to True in order to redo all the preprocessing
     :return:
     """
+
+    mr_ids = []
+    for subject_folder in glob.glob(os.path.join(livers_folder, "*", "*")):
+        if os.path.isdir(subject_folder):
+            if('MR' in subject_folder):
+                mr_ids.append(subject_folder.split("/")[3])
+
+
     for subject_folder in glob.glob(os.path.join(livers_folder, "*", "*")):
         if os.path.isdir(subject_folder): #Ignore everything that is not a directory, no problems for txt etc...
             subject = os.path.basename(subject_folder)
@@ -222,7 +232,7 @@ def convert_livers_data(livers_folder, out_folder, bias_field_correction=False, 
             if not os.path.exists(new_subject_folder) or overwrite:
                 if not os.path.exists(new_subject_folder):
                     os.makedirs(new_subject_folder)
-                convert_livers_folder(subject_folder, new_subject_folder, bias_field_correction )
+                convert_livers_folder(subject_folder, new_subject_folder, bias_field_correction, mr_ids )
 
 
 if __name__ == "__main__":

@@ -224,13 +224,14 @@ if __name__ == '__main__':
     else:
         FLAGS.non_trainable_list = None
 
-    f1 = lambda s: ''.join([(item) for item in s.split(',')])
+    f1 = lambda s: '_'.join([(item) for item in s.split(',')])
     f2 = lambda s: tuple([float(item) for item in s.split(',')])
 
     new_exp_name = os.path.join(FLAGS.Base_directory,'Trained_models')
 
     if FLAGS.model_file == 'None':
-        new_exp_name = os.path.join(new_exp_name, 'Labels_' + f1(FLAGS.labels))
+        new_exp_name = os.path.join(new_exp_name, 'Labels_' + f1(FLAGS.labels.replace(" ","")))
+
         if not FLAGS.transfer_model_file:
             new_exp_name = os.path.join(new_exp_name, 'No_Transfer')
         else:
