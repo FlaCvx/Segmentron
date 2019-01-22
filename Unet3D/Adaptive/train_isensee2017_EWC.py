@@ -127,7 +127,7 @@ def main(overwrite=False):
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(config["GPU"])[1:-1]
 
-    sess = tf.Session(config=tf.ConfigProto(gpu_options=tf.GPUOptions(allow_growth=True)))
+    sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, gpu_options=tf.GPUOptions(allow_growth=True)))
 
     tensorflow_backend.set_session(sess)
 
