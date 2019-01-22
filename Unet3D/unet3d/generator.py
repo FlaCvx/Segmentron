@@ -5,11 +5,15 @@ import itertools
 import pdb
 
 import numpy as np
-
+import matplotlib.pyplot as plt
 from .utils import pickle_dump, pickle_load
 from .utils.patches import compute_patch_indices, get_random_nd_index, get_patch_from_3d_data
 from .augment import augment_data, random_permutation_x_y
 
+def show_liver_slice(index_slice, img_volume):
+    slice = img_volume[index_slice, : , :]
+    plt.figure()
+    plt.imshow(slice, cmap="gray", origin="lower")
 
 def get_training_and_validation_generators(data_file, batch_size, n_labels, training_keys_file, validation_keys_file,
                                            data_split=0.8, overwrite=False, labels=None, augment=False,
