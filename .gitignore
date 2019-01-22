@@ -4,3 +4,7 @@ data/*
 .idea/*
 Data_and_Pretrained_Models/*
 prediction/*
+lsf.*
+*.pyc
+bsub_command
+*leonhard
