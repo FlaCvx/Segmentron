@@ -7,27 +7,35 @@ import os
 import argparse
 import numpy as np
 import pdb
+from tensorflow.python.client import device_lib
 
-def get_free_gpus(num, except_gpu=None):
-    gpu_list = gpustat.GPUStatCollection.new_query()
-    free_gpu = []
-    while not len(free_gpu) == num:
-        for gpu in gpu_list:
-            if not gpu.processes:
-                if not gpu.index == except_gpu:
-                    free_gpu.append(gpu.index)
-            if len(free_gpu) == num:
-                break
-        if not len(free_gpu) == num:
-            free_gpu = []
-            print('Not enough GPUs avaialble at this time. Waiting ....')
-            time.sleep(20)
-    return free_gpu
+# def get_free_gpus(num, except_gpu=None):
+#     gpu_list = gpustat.GPUStatCollection.new_query()
+#     free_gpu = []
+#     while not len(free_gpu) == num:
+#         for gpu in gpu_list:
+#             if not gpu.processes:
+#                 if not gpu.index == except_gpu:
+#                     free_gpu.append(gpu.index)
+#             if len(free_gpu) == num:
+#                 break
+#         if not len(free_gpu) == num:
+#             free_gpu = []
+#             print('Not enough GPUs avaialble at this time. Waiting ....')
+#             time.sleep(20)
+#     return free_gpu
+
+def get_free_gpus():
+    local_device_protos = device_lib.list_local_devices()
+
+    return [x.name.split(":")[2] for x in local_device_protos if x.device_type == 'GPU']
 
 
 def main():
 
-
+    #FLAGS.GPU = get_free_gpus(FLAGS.num_GPU)
+    FLAGS.GPU = get_free_gpus()
+    print("Free gpus: ", FLAGS.GPU)
     train_isensee2017.config.update(vars(FLAGS))
     model = train_isensee2017.main(overwrite=False)
     model
@@ -205,10 +213,6 @@ if __name__ == '__main__':
 
     if not FLAGS.data_file:
         print('Please specify the argument data_file')
-
-    FLAGS.GPU = []
-    for i in range(0,FLAGS.num_GPU):
-        FLAGS.GPU.append(i)
 
     FLAGS.Base_directory = os.path.join(os.getcwd(),'Data_and_Pretrained_Models',FLAGS.Base_directory)
     FLAGS.data_file = os.path.join(FLAGS.Base_directory,FLAGS.data_file)
