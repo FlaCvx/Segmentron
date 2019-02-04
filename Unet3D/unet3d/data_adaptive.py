@@ -24,9 +24,11 @@ def create_data_file(out_file, n_channels, n_samples, image_shape):
                                             filters=filters, expectedrows=n_samples)
     affine_storage = hdf5_file.create_earray(hdf5_file.root, 'affine', tables.Float32Atom(), shape=(0, 4, 4),
                                              filters=filters, expectedrows=n_samples)
-    return hdf5_file, data_storage, truth_storage, affine_storage
+    original_shape_storage = hdf5_file.create_earray(hdf5_file.root, 'shape', tables.Int32Atom(), shape=(0, 3),
+                                             filters=filters, expectedrows=n_samples)
+    return hdf5_file, data_storage, truth_storage, affine_storage, original_shape_storage
 
-def write_image_data_to_file(image_files, data_storage, truth_storage, padding, crop_slice,n_channels, affine_storage,
+def write_image_data_to_file(image_files, data_storage, truth_storage, original_shape_storage, padding, crop_slice,n_channels, affine_storage,
                              truth_dtype=np.uint8, normalize = 'No', image_shape = (160, 208, 160)):
 
     # image_files is -->
@@ -36,8 +38,9 @@ def write_image_data_to_file(image_files, data_storage, truth_storage, padding, 
         # No negative values in padding means the images fit inside the defined shape
         image_shape = None
 
+    original_shape = []
     for set_of_files in image_files:
-        images = reslice_image_set_mrbrains(set_of_files,
+        images, original_shapes = reslice_image_set_mrbrains(set_of_files,
                                             label_indices=len(set_of_files) - 1,
                                             crop_slices=crop_slice,
                                             image_shape=image_shape)
@@ -73,15 +76,15 @@ def write_image_data_to_file(image_files, data_storage, truth_storage, padding, 
                 if all(p > 0 for p in traverse(padding))
                 else np.asarray(image.get_data())
                 for image in images]
-        add_data_to_storage(data_storage, truth_storage, affine_storage, subject_data, np.eye(4), n_channels,truth_dtype)
+        add_data_to_storage(data_storage, truth_storage, original_shape_storage, affine_storage, subject_data, original_shapes, np.eye(4), n_channels,truth_dtype)
     return data_storage, truth_storage
 
 
-def add_data_to_storage(data_storage, truth_storage, affine_storage, subject_data, affine, n_channels, truth_dtype):
+def add_data_to_storage(data_storage, truth_storage, original_shape_storage, affine_storage, subject_data, original_shape, affine, n_channels, truth_dtype):
     data_storage.append(np.asarray(subject_data[:n_channels])[np.newaxis])
     truth_storage.append(np.asarray(subject_data[n_channels], dtype=truth_dtype)[np.newaxis][np.newaxis])
     affine_storage.append(np.asarray(affine)[np.newaxis])
-
+    original_shape_storage.append(np.asarray(np.reshape(original_shape[0], (1, 3))))
 
 def get_crop_slice_and_image_shape(training_data_files):
     starts_list = []
@@ -101,9 +104,8 @@ def get_crop_slice_and_image_shape(training_data_files):
     return crop_slice,image_shape
 
 def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subject_ids=None,
-                       normalize= 'No', image_shape = (512, 512, 512)):
+                       normalize= 'No', image_shape = (128, 512, 512)):
 
-    #TODO: CHANGE THE DEFAULT image_shape
     """
     Takes in a set of training images and writes those images to an hdf5 file.
     :param training_data_files: List of tuples containing the training data files. The modalities should be listed in
@@ -128,12 +130,10 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
     pad = padding(crop_slice,image_shape)
 
     try:
-        hdf5_file, data_storage, truth_storage, affine_storage = create_data_file(out_file,
+        hdf5_file, data_storage, truth_storage, affine_storage, original_shape_storage = create_data_file(out_file,
                                                                                   n_channels=n_channels,
                                                                                   n_samples=n_samples,
                                                                                   image_shape=image_shape)
-        #TODO: CHiedere per i channels. Perchè ellis dice che la ground truth è compresa come channel
-        #TODO: Chiedere a Luca se in "image_shape" devo lasciare image_shape o metter min_dim
 
     except Exception as e:
         # If something goes wrong, delete the incomplete data file
@@ -143,6 +143,7 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
     write_image_data_to_file(training_data_files,
                               data_storage,
                               truth_storage,
+                              original_shape_storage,
                               pad,
                               crop_slice,
                               truth_dtype=truth_dtype,
@@ -150,13 +151,12 @@ def write_data_to_file(training_data_files, out_file, truth_dtype=np.uint8, subj
                               affine_storage=affine_storage,
                               normalize=normalize,
                               image_shape=image_shape)
-    # TODO bis: Chiedere a Luca se in "image_shape" devo lasciare image_shape o come ho fatto metter min_dim
 
-    # TODO: Chiedre a Luca: Siccome ho diversi data associati allo stesso paziente ha senso che crei sto arrai  di subject_ids ?
     if subject_ids:
         hdf5_file.create_array(hdf5_file.root,
                                'subject_ids',
                                obj=subject_ids)
+    
     if normalize == 'mean_and_std':
         normalize_data_storage(data_storage)
     hdf5_file.close()

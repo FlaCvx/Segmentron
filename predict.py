@@ -2,11 +2,12 @@ import argparse
 import os
 import nibabel as nib
 import pandas as pd
-import collections
+import glob
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.distance import cdist
 
+from scipy.spatial import cKDTree
 
 from Unet3D.unet3d.prediction import run_validation_cases
 
@@ -52,36 +53,47 @@ def main():
         required=True,
         help='String; The name for the data_file'
     )
+
+    parser.add_argument(
+        '--interpolation',
+        type=str,
+        default='nearest',
+        required=False,
+        help='Interpolation to be used to restore original shape. '
+    )
     FLAGS, unparsed = parser.parse_known_args()
 
     prediction_dir = os.path.abspath("prediction")
-    fixed_path="./Data_and_Pretrained_Models/Liver Region Segmentation/"
+    fixed_path="./Data_and_Pretrained_Models/Liver_Region_Segmentation/"
 
     f1 = lambda s: '_'.join([(item) for item in s.split(',')])
-    more_fixed_path=os.path.join(".","Data_and_Pretrained_Models","Liver Region Segmentation","Trained_models","Labels_"+f1(FLAGS.labels.replace(" ",""))+"/")
+    more_fixed_path=os.path.join(".","Data_and_Pretrained_Models","Liver_Region_Segmentation","Trained_models","Labels_"+f1(FLAGS.labels.replace(" ",""))+"/")
 
     prediction_dir = os.path.join(prediction_dir,"Labels_"+f1(FLAGS.labels.replace(" ","")), FLAGS.model_file.split("/")[0])
 
     FLAGS.validation_file=os.path.abspath(fixed_path+str(FLAGS.validation_file))
     FLAGS.model_file=os.path.abspath(more_fixed_path+FLAGS.model_file)
     FLAGS.data_file=os.path.abspath(fixed_path+FLAGS.data_file)
-    run_validation_cases(validation_keys_file=FLAGS.validation_file,
-                         model_file=FLAGS.model_file,
-                         training_modalities=FLAGS.training_technologies,
-                         labels=FLAGS.labels,
-                         hdf5_file=FLAGS.data_file,
-                         output_label_map=True,
-                         output_dir=prediction_dir)
-    print("Prediction saved in: "+prediction_dir)
+    if not (os.path.exists(prediction_dir)):
+        run_validation_cases(validation_keys_file=FLAGS.validation_file,
+                             model_file=FLAGS.model_file,
+                             training_modalities=FLAGS.training_technologies,
+                             labels=FLAGS.labels,
+                             hdf5_file=FLAGS.data_file,
+                             interpolation=FLAGS.interpolation,
+                             output_label_map=True,
+                             output_dir=prediction_dir)
+        print("Prediction saved in: "+prediction_dir)
 
 
 
     print("Metrics: ")
 
-
+    prediction_dir = (glob.glob(os.path.join( prediction_dir, "*"))[0])
     truth = nib.load(os.path.abspath(prediction_dir)+"/truth.nii.gz")
     prediction = nib.load(os.path.abspath(prediction_dir)+"/prediction.nii.gz")
 
+    FLAGS.modality='MR'
     show_metrics_table( truth._data, prediction._data, FLAGS.labels, FLAGS.modality)
 
 
@@ -122,16 +134,16 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
         copy_truth = truth_file
         copy_prediction = prediction_file
         for label in labels:
-            truth_file=copy_truth
+            truth_file=copy_truth   #If I have more than one label, each time I set to zero all the other labels.
             prediction_file=copy_prediction
             if label==80:
-                truth_file[np.where(truth_file != 80)] = 0
-                truth_file[np.where(truth_file==80)] = 1
+                truth_file[np.where(truth_file != 80)] = 0  #Set to zero all the elements that do not have label==80
+                truth_file[np.where(truth_file==80)] = 1    #Take all the elements that have label==80.
 
                 prediction_file[np.where(prediction_file != 8)] = 0
                 prediction_file[np.where(prediction_file==8)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
-                #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
+                ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 ASSD=None
                 RMSD=None
                 MSSD =None
@@ -265,6 +277,7 @@ def Average_symmetric_absolute_surface_distance(truth_vol, prediction_vol):
     #Now truth_border and prediction_border are the lists of indices of the border voxels.
     #Now find the
 
+    min_dists, min_dist_idx = cKDTree(truth_border).query(prediction_border, 1)
     Y = cdist(truth_border, prediction_border, 'euclidean')
     minimum_distances_truth = Y.min(axis=1)
     minimum_distances_prediction = Y.min(axis=0)

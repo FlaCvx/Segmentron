@@ -46,27 +46,31 @@ def read_image_files(image_files, image_shape=None, crop=None, label_indices=Non
     elif not isinstance(label_indices, collections.Iterable) or isinstance(label_indices, str):
         label_indices = [label_indices]
     image_list = list()
+    shape_list = list()
     for index, image_file in enumerate(image_files):
         if (label_indices is None and (index + 1) == len(image_files)) \
                 or (label_indices is not None and index in label_indices):
             interpolation = "nearest"
         else:
             interpolation = "linear"
-        image_list.append(read_image(image_file, image_shape=image_shape, crop=crop, interpolation=interpolation))
+        img, shape = read_image(image_file, image_shape=image_shape, crop=crop, interpolation=interpolation)
+        image_list.append(img)
+        shape_list.append(shape)
 
-    return image_list
+    return image_list, shape_list
 
 
 def read_image(in_file, image_shape=None, interpolation='linear', crop=None):
     print("Reading: {0}".format(in_file))
     image = nib.load(os.path.abspath(in_file))
+    or_shape = image.get_data().shape
     image = fix_shape(image)
     if crop:
         image = crop_img_to(image, crop, copy=True)
     if image_shape:
-        return resize(image, new_shape=image_shape, interpolation=interpolation)
+        return resize(image, new_shape=image_shape, interpolation=interpolation), or_shape
     else:
-        return image
+        return image, or_shape
 
 
 def fix_shape(image):

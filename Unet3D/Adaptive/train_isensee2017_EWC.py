@@ -67,11 +67,8 @@ def fetch_training_data_files(return_subject_ids=False):
         )
         raise EnvironmentError
 
-    count=1
     for subject_dir in Directories:
-        #subject_dir.replace(("/" + str(subject_dir.split("/")[4])), ("/" + str(count)))
         subject_ids.append(os.path.basename(subject_dir))
-        #count += 1
         subject_files = list()
         if ((subject_dir.split("/")[3]).split("_")[0] == 'CT'):
             if ('CT' in config["training_technologies"]):
@@ -93,6 +90,7 @@ def fetch_training_data_files(return_subject_ids=False):
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
                         training_data_files.append(tuple(subject_files))
                     else:
+                        #For T2SPIR modality
                         subject_files = list()
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
@@ -110,13 +108,14 @@ def main(overwrite=False):
     config["n_epochs"] = config["epochs"]  # cutoff the training after this many epochs
 
     if overwrite or not os.path.exists(config["data_file"]):
-        print('specified data_file does not exist yet at' + config["data_file"] + '. Trying to build a data_file from '
+        print('specified data_file does not exist yet at' + config["data_file"] + '.\nTrying to build a data_file from '
               'patient data at '+config['data_directory'])
         training_files, subject_ids = fetch_training_data_files(return_subject_ids=True)
 
         subject_ids = list()
         for i in range(1,len(training_files)+1):
             subject_ids.append(str(i))
+
         write_data_to_file(training_files,
                            config["data_file"],
                            image_shape=config["image_shape"],

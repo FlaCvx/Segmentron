@@ -12,6 +12,7 @@ import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
 import argparse
+import pydicom
 
 #This config is modified starting from the one at brats.train
 config = dict()
@@ -52,23 +53,32 @@ def correct_bias(in_file, out_file, image_type=sitk.sitkFloat64):
     return os.path.abspath(out_file)
 
 def extract_dicom_image(image_path, out_file, image_type=sitk.sitkFloat64):
-    if "inPhase" in out_file: #Takes the images that have an even number, should be "in_phase"
+    #InPhase and OutPhase images can be recognized from the EchoTime (InPhase:4.6, OutPhase:2.3)
+    # it can be cheked with:
+    # ds=pydicom.dcmread(tup[10])
+    # ds.EchoTime
+    #It can be checked that the file paths alternate betweetn OutPhase-InPhase. Therefore all the even indices
+    #are OutPhase images, while the odd numbers are InPhase.
+
+    if "outPhase" in out_file: #Takes the images that have an even number, should be "out_phase"
         tup = tuple(extract_dicom_paths(image_path))
+
         input_image = sitk.ReadImage(tup, image_type)
+
         new_arr = sitk.GetArrayFromImage(input_image)
         #Take only even images
-        new_arr = np.fliplr(np.array([new_arr[c,:,:] for c in range(0,len(new_arr),1) if c%2==0])) # Takes even images of the T1DUAL that should be
-        # the ones associated with the in_phase modality.
+        new_arr = np.fliplr(np.array([new_arr[c,:,:] for c in range(0,len(new_arr),1) if c%2==0])) # Takes even images
+        # of the T1DUAL that should be the ones associated with the out_phase modality.
         array_img = nib.Nifti1Image(new_arr, np.diag([1, 2, 3, 1]))
         nib.save(array_img, out_file)  # The file will be array_img.dataobj
 
-    elif "outPhase" in out_file: #Takes the images that have an odd number, should be "out_phase"
+    elif "inPhase" in out_file:
         tup = tuple(extract_dicom_paths(image_path))
         input_image = sitk.ReadImage(tup, image_type)
         new_arr = sitk.GetArrayFromImage(input_image)
         # Take only even images
-        new_arr = np.fliplr(np.array([new_arr[c, :, :] for c in range(0, len(new_arr), 1) if c % 2 != 0]))  # Takes even images of the T1DUAL that should be
-        # the ones associated with the in_phase modality.
+        new_arr = np.fliplr(np.array([new_arr[c, :, :] for c in range(0, len(new_arr), 1) if c % 2 != 0]))  # Takes odd images
+        # of the T1DUAL that should be the ones associated with the in_phase modality.
         array_img = nib.Nifti1Image(new_arr, np.diag([1, 2, 3, 1]))
         nib.save(array_img, out_file)  # The file will be array_img.dataobj
 
@@ -151,7 +161,7 @@ def extract_dicom_paths(PathDicom):
     lstFilesDCM.sort()
     return lstFilesDCM
 
-def convert_livers_folder(in_folder, out_folder, bias_field_correction, truth_name='seg'):
+def convert_livers_folder(in_folder, out_folder, bias_field_correction):
     #The data given by the competition need to be processed beacuse there are different format files etc.
     # It converts everything to .nii (which hopefully will allow me to reuse code in the experiments.
 
@@ -217,13 +227,6 @@ def convert_livers_data(livers_folder, out_folder, bias_field_correction=False, 
     :return:
     """
 
-    mr_ids = []
-    for subject_folder in glob.glob(os.path.join(livers_folder, "*", "*")):
-        if os.path.isdir(subject_folder):
-            if('MR' in subject_folder):
-                mr_ids.append(subject_folder.split("/")[3])
-
-
     for subject_folder in glob.glob(os.path.join(livers_folder, "*", "*")):
         if os.path.isdir(subject_folder): #Ignore everything that is not a directory, no problems for txt etc...
             subject = os.path.basename(subject_folder)
@@ -232,7 +235,7 @@ def convert_livers_data(livers_folder, out_folder, bias_field_correction=False, 
             if not os.path.exists(new_subject_folder) or overwrite:
                 if not os.path.exists(new_subject_folder):
                     os.makedirs(new_subject_folder)
-                convert_livers_folder(subject_folder, new_subject_folder, bias_field_correction, mr_ids )
+                convert_livers_folder(subject_folder, new_subject_folder, bias_field_correction )
 
 
 if __name__ == "__main__":

@@ -45,13 +45,13 @@ def reslice_image_set(in_files, image_shape, out_files=None, label_indices=None,
         return images
 
 def reslice_image_set_mrbrains(in_files, crop_slices, image_shape = None, out_files=None, label_indices=None):
-    images = read_image_files(in_files, image_shape= image_shape, crop=crop_slices, label_indices=label_indices)
+    images, shapes = read_image_files(in_files, image_shape= image_shape, crop=crop_slices, label_indices=label_indices)
     if out_files:
         for image, out_file in zip(images, out_files):
             image.to_filename(out_file)
         return [os.path.abspath(out_file) for out_file in out_files]
     else:
-        return images
+        return images, shapes
 
 
 def get_complete_foreground(training_data_files):
@@ -67,7 +67,7 @@ def get_complete_foreground(training_data_files):
 
 def get_foreground_from_set_of_files(set_of_files, background_value=0, tolerance=0.00001, return_image=False):
     for i, image_file in enumerate(set_of_files):
-        image = read_image(image_file)
+        image, shape = read_image(image_file)
         is_foreground = np.logical_or(image.get_data() < (background_value - tolerance),
                                       image.get_data() > (background_value + tolerance))
         if i == 0:
