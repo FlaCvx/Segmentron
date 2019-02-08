@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--Base_directory',
         type=str,
-        default='Liver_Region_Segmentation',
+        default='Liver Region Segmentation',
         help='String; New Folder where The Model will be stored.'
     )
     parser.add_argument(
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--labels',
         type=str,
-        default=('80, 160, 240, 255'),
+        default='80, 160, 240, 255',
         help='Which labels to detect. 80: Liver, 160: Right Kidney, 240: Left Kidney, 255:Spleen'
     )
 
@@ -209,6 +209,13 @@ if __name__ == '__main__':
         help='Number of epochs to use for training.'
     )
 
+    parser.add_argument(
+        '--nb_channels',
+        type=int,
+        default=1,
+        help='Number of copies of the same data for the different channels. Need it for pretrained model with brats'
+    )
+
     FLAGS, unparsed = parser.parse_known_args()
 
     if not FLAGS.data_file:
@@ -217,7 +224,7 @@ if __name__ == '__main__':
     FLAGS.Base_directory = os.path.join(os.getcwd(),'Data_and_Pretrained_Models',FLAGS.Base_directory)
     FLAGS.data_file = os.path.join(FLAGS.Base_directory,FLAGS.data_file)
 
-    FLAGS.nb_channels = 1
+    #FLAGS.nb_channels = 1
 
     FLAGS.patch_shape = None
     FLAGS.truth_channel = FLAGS.nb_channels

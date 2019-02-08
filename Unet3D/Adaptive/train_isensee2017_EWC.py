@@ -72,6 +72,9 @@ def fetch_training_data_files(return_subject_ids=False):
         subject_files = list()
         if ((subject_dir.split("/")[3]).split("_")[0] == 'CT'):
             if ('CT' in config["training_technologies"]):
+                if (config["nb_channels"] != 1):
+                    for copy in range(1,config["nb_channels"]):
+                        subject_files.append(os.path.join(subject_dir, 'CT' + ending))
                 subject_files.append(os.path.join(subject_dir, 'CT' +ending))
                 subject_files.append(os.path.join(subject_dir, 'CT' +truth))
                 training_data_files.append(tuple(subject_files))
@@ -81,17 +84,26 @@ def fetch_training_data_files(return_subject_ids=False):
                     if modality == 'T1DUAL':
                         #Once for in_phase data
                         subject_files = list()
+                        if (config["nb_channels"] != 1):
+                            for copy in range(1, config["nb_channels"]):
+                                subject_files.append(os.path.join(subject_dir, 'MR_inPhase_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_inPhase_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
                         training_data_files.append(tuple(subject_files))
                         #Once for out_phase data
                         subject_files = list()
+                        if (config["nb_channels"] != 1):
+                            for copy in range(1, config["nb_channels"]):
+                                subject_files.append(os.path.join(subject_dir, 'MR_outPhase_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_outPhase_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
                         training_data_files.append(tuple(subject_files))
                     else:
                         #For T2SPIR modality
                         subject_files = list()
+                        if (config["nb_channels"] != 1):
+                            for copy in range(1, config["nb_channels"]):
+                                subject_files.append(os.path.join(subject_dir, 'MR_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + ending))
                         subject_files.append(os.path.join(subject_dir, 'MR_' + modality + truth))
                         training_data_files.append(tuple(subject_files))
