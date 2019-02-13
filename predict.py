@@ -116,7 +116,9 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
             rows.append("Left Kidney")
         if label == 255:
             rows.append("Spleen")
-
+    ASSD = None
+    RMSD = None
+    MSSD = None
     d = {}
     #df = pd.DataFrame(data=d,  columns=columns, rows=rows )
     if (modality=='CT'):
@@ -125,9 +127,7 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
         prediction_file[np.where(prediction_file == 8)] = 1
         VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
         #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
-        ASSD = None
-        RMSD = None
-        MSSD = None
+
         d['Liver'] =  [ VO, RAVD, ASSD, RMSD, MSSD  ]
     else:
         print("Print the liver metrics of the following labels: ", labels)
@@ -143,14 +143,14 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
                 prediction_file[np.where(prediction_file != 8)] = 0
                 prediction_file[np.where(prediction_file==8)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
-                ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
+                #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 d['Liver'] = [VO, RAVD, ASSD, RMSD, MSSD ]
 
             if label==160:
                 truth_file[np.where(truth_file != 160)] = 0
                 truth_file[np.where(truth_file == 160)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
-                ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
+                #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
 
                 d['Right Kidney'] = [VO, RAVD, ASSD, RMSD, MSSD ]
 
@@ -159,14 +159,14 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
                 truth_file[np.where(truth_file != 240)] = 0
                 truth_file[np.where(truth_file == 240)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
-                ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
+                #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 d['Left Kidney'] = [VO, RAVD, ASSD, RMSD, MSSD ]
             if label==255:
 
                 truth_file[np.where(truth_file !=255)] = 0
                 truth_file[np.where(truth_file == 255)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
-                ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
+                #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 d['Spleen'] = [ VO, RAVD, ASSD, RMSD, MSSD ]
 
     df = pd.DataFrame(data=d)

@@ -248,8 +248,7 @@ if __name__ == '__main__':
         else:
             tr_model = os.path.relpath(FLAGS.transfer_model_file, os.getcwd())
             new_exp_name = os.path.join(new_exp_name,
-                                        'Transfer',
-                                        tr_model.translate((None, '.')).translate((None, '/')) + '_as_transfer_model')
+                                        'Transfer')
         if FLAGS.ID != 'None':
             new_exp_name += FLAGS.ID
             print('Experiment with ' + FLAGS.ID + ' is run')
