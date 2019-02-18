@@ -40,7 +40,7 @@ def main():
 
     parser.add_argument(
         '--labels',
-        type=lambda s: tuple([float(item) for item in s.split(',')]),
+        type=lambda s: tuple([int(item) for item in s.split(',')]),
         default=(80, 160, 240, 255),
         required=False,
         help='Which labels to show. 80: Liver, 160: Right Kidney, 240: Left Kidney, 255:Spleen'
