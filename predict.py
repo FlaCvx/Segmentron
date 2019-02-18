@@ -40,9 +40,9 @@ def main():
 
     parser.add_argument(
         '--labels',
-        type=str,
-        default=('80, 160, 240, 255'),
-        required=True,
+        type=lambda s: tuple([float(item) for item in s.split(',')]),
+        default=(80, 160, 240, 255),
+        required=False,
         help='Which labels to show. 80: Liver, 160: Right Kidney, 240: Left Kidney, 255:Spleen'
     )
 
@@ -66,10 +66,10 @@ def main():
     prediction_dir = os.path.abspath("prediction")
     fixed_path="./Data_and_Pretrained_Models/Liver Region Segmentation/"
 
-    f1 = lambda s: '_'.join([(item) for item in s.split(',')])
-    more_fixed_path=os.path.join(".","Data_and_Pretrained_Models","Liver Region Segmentation","Trained_models","Labels_"+f1(FLAGS.labels.replace(" ",""))+"/")
+    f1 = lambda s: '_'.join([str(item) for item in s])
+    more_fixed_path=os.path.join(".","Data_and_Pretrained_Models","Liver Region Segmentation","Trained_models","Labels_"+f1(FLAGS.labels)+"/")
 
-    prediction_dir = os.path.join(prediction_dir,"Labels_"+f1(FLAGS.labels.replace(" ","")), FLAGS.model_file.split("/")[0])
+    prediction_dir = os.path.join(prediction_dir,"Labels_"+f1(FLAGS.labels), FLAGS.model_file.split("/")[0])
 
     FLAGS.validation_file=os.path.abspath(fixed_path+str(FLAGS.validation_file))
     FLAGS.model_file=os.path.abspath(more_fixed_path+FLAGS.model_file)
@@ -105,43 +105,33 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
     prediction_file = prediction_file.__array__()
     columns = ['Volumetric overlap', 'Relative absolute volume difference', 'Average symmetric surface distance',
                'Root mean square symmetric surface distance', 'Maximum symmetric surface distance']
-    rows = []
-    labels = [int(num) for num in labels.replace(" ", "").split(",")]
-    for label in labels:
-        if label == 80:
-            rows.append("Liver")
-        if label == 160:
-            rows.append("Right Kidney")
-        if label == 240:
-            rows.append("Left Kidney")
-        if label == 255:
-            rows.append("Spleen")
+
     ASSD = None
     RMSD = None
     MSSD = None
     d = {}
-    #df = pd.DataFrame(data=d,  columns=columns, rows=rows )
+
     if (modality=='CT'):
         print("Modality is 'CT', therefore print only liver metrics")
-        prediction_file[np.where(prediction_file != 8)] = 0
-        prediction_file[np.where(prediction_file == 8)] = 1
+        prediction_file[np.where(prediction_file != 80)] = 0
+        prediction_file[np.where(prediction_file == 80)] = 1
         VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
         #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
 
         d['Liver'] =  [ VO, RAVD, ASSD, RMSD, MSSD  ]
     else:
         print("Print the liver metrics of the following labels: ", labels)
-        copy_truth = truth_file
-        copy_prediction = prediction_file
+        copy_truth = np.copy(truth_file)
+        copy_prediction = np.copy(prediction_file)
         for label in labels:
-            truth_file=copy_truth   #If I have more than one label, each time I set to zero all the other labels.
-            prediction_file=copy_prediction
+            truth_file=np.copy(copy_truth)   #If I have more than one label, each time I set to zero all the other labels.
+            prediction_file=np.copy(copy_prediction)
             if label==80:
                 truth_file[np.where(truth_file != 80)] = 0  #Set to zero all the elements that do not have label==80
                 truth_file[np.where(truth_file==80)] = 1    #Take all the elements that have label==80.
 
-                prediction_file[np.where(prediction_file != 8)] = 0
-                prediction_file[np.where(prediction_file==8)] = 1
+                prediction_file[np.where(prediction_file != 80)] = 0
+                prediction_file[np.where(prediction_file==80)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
                 #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 d['Liver'] = [VO, RAVD, ASSD, RMSD, MSSD ]
@@ -149,6 +139,9 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
             if label==160:
                 truth_file[np.where(truth_file != 160)] = 0
                 truth_file[np.where(truth_file == 160)] = 1
+
+                prediction_file[np.where(prediction_file != 160)] = 0
+                prediction_file[np.where(prediction_file==160)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
                 #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
 
@@ -158,6 +151,9 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
 
                 truth_file[np.where(truth_file != 240)] = 0
                 truth_file[np.where(truth_file == 240)] = 1
+
+                prediction_file[np.where(prediction_file != 240)] = 0
+                prediction_file[np.where(prediction_file==240)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
                 #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 d['Left Kidney'] = [VO, RAVD, ASSD, RMSD, MSSD ]
@@ -165,6 +161,9 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
 
                 truth_file[np.where(truth_file !=255)] = 0
                 truth_file[np.where(truth_file == 255)] = 1
+
+                prediction_file[np.where(prediction_file != 255)] = 0
+                prediction_file[np.where(prediction_file==255)] = 1
                 VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
                 #ASSD, RMSD, MSSD = Average_symmetric_absolute_surface_distance(truth_file, prediction_file)
                 d['Spleen'] = [ VO, RAVD, ASSD, RMSD, MSSD ]
@@ -192,13 +191,16 @@ def volumetric_overlap_error( truth, prediction):
         prediction_vol += new_prediction_vol
         union_vol += new_union
 
-    VO = overlap/union_vol
+    if(union_vol!=0):
+        VO = overlap/union_vol
+    else:
+        VO=0
     # Relative absolute volume difference(RAVD): Also provides information about the differences
     # between volumes between segmented and reference organs, but values the differences more
     # than overlap(0 for a perfect segmentation).
     #
     RAVD = abs(prediction_vol-truth_vol)
-    return VO, RAVD
+    return VO, int(RAVD)
 
 
 def count_slice_overlap(truth_slice, prediction_slice):

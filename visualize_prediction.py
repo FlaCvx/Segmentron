@@ -15,14 +15,22 @@ def show_liver_slice(index_slice, img_volume):
 
 
 
-def show_differences(data, truth, prediction):
+def show_differences(data, truth, prediction, labels):
     count=0
 
+    new_truth = np.copy(truth)
+    new_truth[:,:,:] = 0
+    for label in labels:
+        label=int(label)
+        a = np.where( truth.__array__() == label )
+        new_indices = [(tuple1, tuple2, tuple3) for tuple1, tuple2, tuple3 in zip(a[0], a[1], a[2])]
+        for ind in new_indices:
+            new_truth[ind[0], ind[1], ind[2]] = label
 
     # Plot sequence of slices of livers
     fig, axeslist = plt.subplots(ncols=3, nrows=1)
 
-    for slice1, slice2, slice3 in zip(data, truth, prediction):
+    for slice1, slice2, slice3 in zip(data, new_truth, prediction):
         count += 1
         fig.suptitle('Slice: '+str(count), fontsize=20)
         axeslist.ravel()[0].imshow(slice1, cmap=plt.gray())
@@ -99,7 +107,7 @@ def main():
     prediction = nib.load(os.path.abspath(FLAGS.prediction_file))
 
 
-    show_differences(data._data, truth._data, prediction._data)
+    show_differences(data._data.__array__(), truth._data.__array__(), prediction._data.__array__(), FLAGS.labels.replace(" ","").split(","))
 
 
 
