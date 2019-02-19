@@ -117,6 +117,9 @@ def show_metrics_table(truth_file, prediction_file, labels, modality):
 
     if (modality=='CT'):
         print("Modality is 'CT', therefore print only liver metrics")
+        truth_file[np.where(truth_file != 80)] = 0  # Set to zero all the elements that do not have label==80
+        truth_file[np.where(truth_file == 80)] = 1
+
         prediction_file[np.where(prediction_file != 80)] = 0
         prediction_file[np.where(prediction_file == 80)] = 1
         VO, RAVD = volumetric_overlap_error(truth_file, prediction_file)
