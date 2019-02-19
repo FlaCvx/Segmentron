@@ -272,6 +272,7 @@ if __name__ == '__main__':
     FLAGS.labels = f2(FLAGS.labels)
     FLAGS.n_labels = len(FLAGS.labels)
 
+    print("Prediction for labels :", FLAGS.labels)
     if not FLAGS.return_name_only:
         main()
     else:
