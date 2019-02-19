@@ -93,8 +93,12 @@ def main():
     truth = nib.load(os.path.abspath(prediction_dir)+"/truth.nii.gz")
     prediction = nib.load(os.path.abspath(prediction_dir)+"/prediction.nii.gz")
 
-    FLAGS.modality='MR'
-    show_metrics_table( truth._data, prediction._data, FLAGS.labels, FLAGS.modality)
+    CT_modality = FLAGS.data_file.find("CT")
+    if (CT_modality > -1):
+        modality='CT'
+    else:
+        modality='MR'
+    show_metrics_table( truth._data, prediction._data, FLAGS.labels, modality=modality)
 
 
 

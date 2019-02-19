@@ -80,7 +80,7 @@ def main():
         '--modality',
         type=str,
         default=None,
-        required=True,
+        required=False,
         help='Name modality used in the truth file'
     )
 
